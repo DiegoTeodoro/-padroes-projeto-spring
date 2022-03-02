@@ -1,0 +1,84 @@
+package com.produtos.api.rest.controllers;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.produtos.api.rest.model.Produto;
+import com.produtos.api.rest.repository.ProdutoRepository;
+
+@RestController
+public class ProdutoController {
+
+	@Autowired
+	ProdutoRepository produtoRepository;
+	
+	@GetMapping("/produtos")
+	public ResponseEntity<List<Produto>> getAllProdutos(){
+		List<Produto> produtoList = produtoRepository.findAll();
+		if(produtoList.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}else {
+			return new ResponseEntity<List<Produto>>(produtoList, HttpStatus.OK);
+		}
+	}
+	
+	@GetMapping("/produtos/{id}")
+	public ResponseEntity<Produto> getOneProduto(@PathVariable(value="id")long id){
+		Optional<Produto> produtoO = produtoRepository.findById(id);
+		if(!produtoO.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}else {
+			return new ResponseEntity<>(produtoO.get(), HttpStatus.OK);
+		}		
+		
+	}
+	
+	/*@PostMapping("/produtos")
+	public ResponseEntity<Produto> saveProduto(@RequestBody @Validated Produto produto){
+		return new ResponseEntity<Produto>(produtoRepository.save(produto), HttpStatus.CREATED);
+	}*/
+	
+	@PostMapping("/produtos")
+	public Produto salvaProduto(@RequestBody @Validated Produto produto) {
+		return produtoRepository.save(produto);
+	}
+	
+	
+	@DeleteMapping("/produtos/{id}")
+	public ResponseEntity<?> deleteProduto(@PathVariable(value="id") long id){
+		Optional<Produto> produtoO = produtoRepository.findById(id);
+		
+		if(!produtoO.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}else {
+			produtoRepository.delete(produtoO.get());
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+	}
+	
+	public ResponseEntity<Produto> updateProduto(@PathVariable(value="id") long id, 
+			@RequestBody @Validated Produto produto ) {
+		Optional<Produto> produtoO = produtoRepository.findById(id);
+		if(!produtoO.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}else {
+			produto.setId(produtoO.get().getId());
+			return new ResponseEntity<Produto>(produtoRepository.save(produto),HttpStatus.OK);
+		}
+	}
+	
+
+	
+	
+}

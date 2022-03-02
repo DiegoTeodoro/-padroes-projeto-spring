@@ -1,0 +1,28 @@
+package com.produtos.api.rest.controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.produtos.api.rest.model.Produto;
+import com.produtos.api.rest.repository.ProdutoRepository;
+
+@RestController
+public class ProdutoController {
+
+	@Autowired
+	ProdutoRepository produtoRepository;
+	
+	public ResponseEntity<List<Produto>> getAllProdutos(){
+		List<Produto> produtoList = produtoRepository.findAll();
+		if(produtoList.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}else {
+			return new ResponseEntity<List<Produto>>(produtoList, HttpStatus.OK);
+		}
+	}
+	
+}

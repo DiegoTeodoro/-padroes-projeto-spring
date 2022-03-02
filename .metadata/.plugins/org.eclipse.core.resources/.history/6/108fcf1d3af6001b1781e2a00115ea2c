@@ -1,0 +1,5 @@
+package com.produtos.api.rest.repository;
+
+public interface ProdutoRepository {
+
+}
